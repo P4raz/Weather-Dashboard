@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hourly Weather Forecast</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #72edf2 0%, #5151e5 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            font-weight: 500;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #location-input {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 30px;
+            width: 70%;
+            max-width: 400px;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #search-btn, #current-location-btn {
+            background-color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            color: #5151e5;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        #search-btn:hover, #current-location-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .location-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .location-container h2 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .unit-toggle {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .unit-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin: 0 5px;
+        }
+
+        .unit-btn.active {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .hourly-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 0;
+            margin-bottom: 30px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+
+        .hourly-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .hourly-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .hourly-container::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .hourly-item {
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            min-width: 120px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .hourly-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .hour-time {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .hour-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 10px;
+        }
+
+        .hour-temp {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .hour-details {
+            font-size: 0.9rem;
+        }
+
+        .hour-details div {
+            margin-bottom: 5px;
+        }
+
+        .hour-details span:first-child {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .day-separator {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin: 20px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 30px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .hourly-item {
+                min-width: 100px;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .hourly-item {
+                min-width: 90px;
+                padding: 10px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hourly Forecast</h1>
+            <div class="nav-links">
+                <a href="index.html">Current Weather</a>
+                <a href="forecast.html">5-Day Forecast</a>
+                <a href="hourly.html" class="active">Hourly Forecast</a>
+            </div>
+            <div class="search-container">
+                <input type="text" id="location-input" placeholder="Enter city name...">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
+                <button id="current-location-btn"><i class="fas fa-location-arrow"></i></button>
+            </div>
+        </header>
+
+        <div class="location-container">
+            <h2 id="location">--</h2>
+        </div>
+
+        <div class="unit-toggle">
+            <button class="unit-btn active" id="celsius-btn">°C</button>
+            <button class="unit-btn" id="fahrenheit-btn">°F</button>
+        </div>
+
+        <div id="hourly-forecast-container">
+            <!-- Hourly forecast will be inserted here by JavaScript -->
+        </div>
+
+        <footer>
+            <p>Last updated: <span id="last-updated">--</span></p>
+        </footer>
+    </div>
+
+    <script>
+        // API configuration
+        const API_KEY = 'YOUR_API_KEY'; // Replace with your OpenWeatherMap API key
+        const FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast';
+        const CURRENT_URL = 'https://api.openweathermap.org/data/2.5/weather';
+
+        // DOM elements
+        const locationInput = document.getElementById('location-input');
+        const searchBtn = document.getElementById('search-btn');
+        const currentLocationBtn = document.getElementById('current-location-btn');
+        const locationElement = document.getElementById('location');
+        const hourlyContainer = document.getElementById('hourly-forecast-container');
+        const lastUpdatedElement = document.getElementById('last-updated');
+        const celsiusBtn = document.getElementById('celsius-btn');
+        const fahrenheitBtn = document.getElementById('fahrenheit-btn');
+
+        let currentUnit = 'celsius';
+        let currentLocation = 'London';
+
+        // Event listeners
+        searchBtn.addEventListener('click', () => {
+            const location = locationInput.value.trim();
+            if (location) {
+                currentLocation = location;
+                getHourlyForecast(location);
+            }
+        });
+
+        currentLocationBtn.addEventListener('click', getHourlyByCurrentLocation);
+
+        locationInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const location = locationInput.value.trim();
+                if (location) {
+                    currentLocation = location;
+                    getHourlyForecast(location);
+                }
+            }
+        });
+
+        celsiusBtn.addEventListener('click', () => {
+            if (currentUnit !== 'celsius') {
+                toggleTemperatureUnit('celsius');
+                getHourlyForecast(currentLocation); // Refresh data to update units
+            }
+        });
+
+        fahrenheitBtn.addEventListener('click', () => {
+            if (currentUnit !== 'fahrenheit') {
+                toggleTemperatureUnit('fahrenheit');
+                getHourlyForecast(currentLocation); // Refresh data to update units
+            }
+        });
+
+        // Functions
+        async function getHourlyForecast(location) {
+            try {
+                // First get current weather for location display
+                const currentResponse = await fetch(`${CURRENT_URL}?q=${location}&appid=${API_KEY}&units=metric`);
+                const currentData = await currentResponse.json();
+                
+                if (currentData.cod === 200) {
+                    locationElement.textContent = `${currentData.name}, ${currentData.sys.country}`;
+                    
+                    // Then get forecast data
+                    const forecastResponse = await fetch(`${FORECAST_URL}?q=${location}&appid=${API_KEY}&units=metric`);
+                    const forecastData = await forecastResponse.json();
+                    
+                    if (forecastData.cod === "200") {
+                        updateHourlyForecast(forecastData);
+                    } else {
+                        alert('Error fetching forecast data. Please try again.');
+                    }
+                } else {
+                    alert('Location not found. Please try another city.');
+                }
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+                alert('Error fetching weather data. Please try again.');
+            }
+        }
+
+        async function getHourlyByCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const { latitude, longitude } = position.coords;
+                        try {
+                            // First get current weather for location display
+                            const currentResponse = await fetch(`${CURRENT_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`);
+                            const currentData = await currentResponse.json();
+                            
+                            currentLocation = currentData.name;
+                            locationElement.textContent = `${currentData.name}, ${currentData.sys.country}`;
+                            
+                            // Then get forecast data
+                            const forecastResponse = await fetch(`${FORECAST_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`);
+                            const forecastData = await forecastResponse.json();
+                            
+                            if (forecastData.cod === "200") {
+                                updateHourlyForecast(forecastData);
+                            } else {
+                                alert('Error fetching forecast data. Please try again.');
+                            }
+                        } catch (error) {
+                            console.error('Error fetching weather data:', error);
+                            alert('Error fetching weather data. Please try again.');
+                        }
+                    },
+                    (error) => {
+                        console.error('Error getting location:', error);
+                        alert('Unable to retrieve your location. Please enable location services or search manually.');
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by your browser. Please search manually.');
+            }
+        }
+
+        function updateHourlyForecast(data) {
+            // Clear previous forecast
+            hourlyContainer.innerHTML = '';
+            
+            // Group forecast by day
+            const hourlyForecast = {};
+            const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            
+            data.list.forEach(item => {
+                const date = new Date(item.dt * 1000);
+                const dateString = date.toLocaleDateString();
+                
+                if (!hourlyForecast[dateString]) {
+                    hourlyForecast[dateString] = {
+                        date: date,
+                        items: []
+                    };
+                }
+                
+                hourlyForecast[dateString].items.push(item);
+            });
+            
+            // Display forecast for today and tomorrow (first 2 days)
+            const forecastDays = Object.keys(hourlyForecast).slice(0, 2);
+            
+            forecastDays.forEach(day => {
+                const dayData = hourlyForecast[day];
+                const dayName = daysOfWeek[dayData.date.getDay()];
+                const dateStr = dayData.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                
+                // Add day separator
+                const daySeparator = document.createElement('div');
+                daySeparator.className = 'day-separator';
+                daySeparator.textContent = `${dayName}, ${dateStr}`;
+                hourlyContainer.appendChild(daySeparator);
+                
+                // Create hourly container for this day
+                const dayContainer = document.createElement('div');
+                dayContainer.className = 'hourly-container';
+                
+                // Add hourly items
+                dayData.items.forEach(item => {
+                    const time = new Date(item.dt * 1000);
+                    const timeStr = time.toLocaleTimeString([], { hour: '2-digit', hour12: true });
+                    
+                    // Convert temperatures based on current unit
+                    const temp = currentUnit === 'celsius' ? 
+                        Math.round(item.main.temp) : 
+                        Math.round((item.main.temp * 9/5) + 32);
+                    
+                    const feelsLike = currentUnit === 'celsius' ? 
+                        Math.round(item.main.feels_like) : 
+                        Math.round((item.main.feels_like * 9/5) + 32);
+                    
+                    const windSpeed = currentUnit === 'celsius' ? 
+                        `${Math.round(item.wind.speed * 3.6)} km/h` : 
+                        `${Math.round(item.wind.speed * 3.6 / 1.609)} mph`;
+                    
+                    // Create hourly item
+                    const hourlyItem = document.createElement('div');
+                    hourlyItem.className = 'hourly-item';
+                    hourlyItem.innerHTML = `
+                        <div class="hour-time">${timeStr}</div>
+                        <img class="hour-icon" src="https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png" alt="${item.weather[0].description}">
+                        <div class="hour-temp">${temp}°</div>
+                        <div class="hour-details">
+                            <div>
+                                <span>Feels:</span>
+                                <span>${feelsLike}°</span>
+                            </div>
+                            <div>
+                                <span>Precip:</span>
+                                <span>${Math.round(item.pop * 100)}%</span>
+                            </div>
+                            <div>
+                                <span>Wind:</span>
+                                <span>${windSpeed}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    dayContainer.appendChild(hourlyItem);
+                });
+                
+                hourlyContainer.appendChild(dayContainer);
+            });
+            
+            // Update last updated time
+            const now = new Date();
+            lastUpdatedElement.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function toggleTemperatureUnit(unit) {
+            currentUnit = unit;
+            
+            // Update active button
+            if (unit === 'celsius') {
+                celsiusBtn.classList.add('active');
+                fahrenheitBtn.classList.remove('active');
+            } else {
+                celsiusBtn.classList.remove('active');
+                fahrenheitBtn.classList.add('active');
+            }
+        }
+
+        // Initialize with default location
+        getHourlyForecast(currentLocation);
+    </script>
+</body>
+</html>

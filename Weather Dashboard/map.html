@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #72edf2 0%, #5151e5 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            font-weight: 500;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #location-input {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 30px;
+            width: 70%;
+            max-width: 400px;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #search-btn, #current-location-btn {
+            background-color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            color: #5151e5;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        #search-btn:hover, #current-location-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .location-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .location-container h2 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .map-controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .map-type-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .map-type-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .map-type-btn.active {
+            background-color: rgba(255, 255, 255, 0.4);
+            font-weight: 500;
+        }
+
+        .map-container {
+            height: 500px;
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        #weather-map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .map-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .map-legend {
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .legend-title {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 30px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .map-container {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .map-container {
+                height: 300px;
+            }
+            
+            .map-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Weather Map</h1>
+            <div class="nav-links">
+                <a href="index.html">Current Weather</a>
+                <a href="forecast.html">5-Day Forecast</a>
+                <a href="hourly.html">Hourly Forecast</a>
+                <a href="map.html" class="active">Weather Map</a>
+            </div>
+            <div class="search-container">
+                <input type="text" id="location-input" placeholder="Enter city name...">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
+                <button id="current-location-btn"><i class="fas fa-location-arrow"></i></button>
+            </div>
+        </header>
+
+        <div class="location-container">
+            <h2 id="location">--</h2>
+        </div>
+
+        <div class="map-controls">
+            <button class="map-type-btn active" data-layer="temp">Temperature</button>
+            <button class="map-type-btn" data-layer="precipitation">Precipitation</button>
+            <button class="map-type-btn" data-layer="wind">Wind</button>
+            <button class="map-type-btn" data-layer="clouds">Clouds</button>
+            <button class="map-type-btn" data-layer="pressure">Pressure</button>
+        </div>
+
+        <div class="map-container">
+            <div id="weather-map"></div>
+            <div class="map-loading" id="map-loading">
+                <p>Loading map data...</p>
+            </div>
+        </div>
+
+        <div class="map-legend" id="temp-legend">
+            <div class="legend-title">Temperature Legend (°C)</div>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #313695;"></div>
+                    <span>-40°C and below</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #4575b4;"></div>
+                    <span>-30°C to -20°C</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #74add1;"></div>
+                    <span>-20°C to -10°C</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #abd9e9;"></div>
+                    <span>-10°C to 0°C</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #e0f3f8;"></div>
+                    <span>0°C to 10°C</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffffbf;"></div>
+                    <span>10°C to 20°C</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #fee090;"></div>
+                    <span>20°C to 30°C</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #fdae61;"></div>
+                    <span>30°C to 40°C</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #f46d43;"></div>
+                    <span>40°C and above</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="map-legend" id="precip-legend" style="display: none;">
+            <div class="legend-title">Precipitation Legend (mm)</div>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #f7fcf5;"></div>
+                    <span>0-0.1</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #e5f5e0;"></div>
+                    <span>0.1-0.5</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #c7e9c0;"></div>
+                    <span>0.5-1</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #a1d99b;"></div>
+                    <span>1-2</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #74c476;"></div>
+                    <span>2-5</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #41ab5d;"></div>
+                    <span>5-10</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #238b45;"></div>
+                    <span>10-20</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #006d2c;"></div>
+                    <span>20-50</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #00441b;"></div>
+                    <span>50+</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="map-legend" id="wind-legend" style="display: none;">
+            <div class="legend-title">Wind Speed Legend (km/h)</div>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffffcc;"></div>
+                    <span>0-5</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #c7e9b4;"></div>
+                    <span>5-10</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #7fcdbb;"></div>
+                    <span>10-20</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #41b6c4;"></div>
+                    <span>20-30</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2c7fb8;"></div>
+                    <span>30-40</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #253494;"></div>
+                    <span>40-50</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #081d58;"></div>
+                    <span>50+</span>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Last updated: <span id="last-updated">--</span></p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // API configuration
+        const API_KEY = 'YOUR_API_KEY'; // Replace with your OpenWeatherMap API key
+        const CURRENT_URL = 'https://api.openweathermap.org/data/2.5/weather';
+        const MAP_TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const MAP_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+        // DOM elements
+        const locationInput = document.getElementById('location-input');
+        const searchBtn = document.getElementById('search-btn');
+        const currentLocationBtn = document.getElementById('current-location-btn');
+        const locationElement = document.getElementById('location');
+        const lastUpdatedElement = document.getElementById('last-updated');
+        const mapLoadingElement = document.getElementById('map-loading');
+        const mapTypeButtons = document.querySelectorAll('.map-type-btn');
+        const legendElements = {
+            temp: document.getElementById('temp-legend'),
+            precipitation: document.getElementById('precip-legend'),
+            wind: document.getElementById('wind-legend')
+        };
+
+        // Map variables
+        let map;
+        let currentMarker;
+        let currentLayer = 'temp';
+        let currentLocation = 'London';
+        let weatherLayers = {
+            temp: null,
+            precipitation: null,
+            wind: null,
+            clouds: null,
+            pressure: null
+        };
+
+        // Initialize map
+        function initMap(lat = 51.505, lng = -0.09, zoom = 5) {
+            if (map) map.remove();
+            
+            map = L.map('weather-map').setView([lat, lng], zoom);
+            L.tileLayer(MAP_TILE_URL, {
+                attribution: MAP_ATTRIBUTION,
+                maxZoom: 18,
+            }).addTo(map);
+            
+            // Add default marker
+            if (currentMarker) map.removeLayer(currentMarker);
+            currentMarker = L.marker([lat, lng]).addTo(map)
+                .bindPopup('Loading weather data...')
+                .openPopup();
+        }
+
+        // Event listeners
+        searchBtn.addEventListener('click', () => {
+            const location = locationInput.value.trim();
+            if (location) {
+                currentLocation = location;
+                getWeatherForMap(location);
+            }
+        });
+
+        currentLocationBtn.addEventListener('click', getMapByCurrentLocation);
+
+        locationInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const location = locationInput.value.trim();
+                if (location) {
+                    currentLocation = location;
+                    getWeatherForMap(location);
+                }
+            }
+        });
+
+        mapTypeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Update active button
+                mapTypeButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Update map layer
+                currentLayer = button.dataset.layer;
+                updateMapLayer();
+                
+                // Update legend visibility
+                Object.values(legendElements).forEach(legend => legend.style.display = 'none');
+                if (legendElements[currentLayer]) {
+                    legendElements[currentLayer].style.display = 'block';
+                }
+            });
+        });
+
+        // Functions
+        async function getWeatherForMap(location) {
+            showLoading();
+            try {
+                const response = await fetch(`${CURRENT_URL}?q=${location}&appid=${API_KEY}&units=metric`);
+                const data = await response.json();
+                
+                if (data.cod === 200) {
+                    updateMapWithWeatherData(data);
+                } else {
+                    alert('Location not found. Please try another city.');
+                    hideLoading();
+                }
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+                alert('Error fetching weather data. Please try again.');
+                hideLoading();
+            }
+        }
+
+        async function getMapByCurrentLocation() {
+            if (navigator.geolocation) {
+                showLoading();
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const { latitude, longitude } = position.coords;
+                        try {
+                            const response = await fetch(`${CURRENT_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`);
+                            const data = await response.json();
+                            
+                            currentLocation = data.name;
+                            updateMapWithWeatherData(data);
+                        } catch (error) {
+                            console.error('Error fetching weather data:', error);
+                            alert('Error fetching weather data. Please try again.');
+                            hideLoading();
+                        }
+                    },
+                    (error) => {
+                        console.error('Error getting location:', error);
+                        alert('Unable to retrieve your location. Please enable location services or search manually.');
+                        hideLoading();
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by your browser. Please search manually.');
+            }
+        }
+
+        function updateMapWithWeatherData(data) {
+            // Update location display
+            locationElement.textContent = `${data.name}, ${data.sys.country}`;
+            
+            // Update map view
+            const lat = data.coord.lat;
+            const lng = data.coord.lon;
+            initMap(lat, lng, 10);
+            
+            // Update marker
+            if (currentMarker) map.removeLayer(currentMarker);
+            currentMarker = L.marker([lat, lng]).addTo(map)
+                .bindPopup(`
+                    <b>${data.name}</b><br>
+                    Temp: ${Math.round(data.main.temp)}°C<br>
+                    Weather: ${data.weather[0].main}<br>
+                    Humidity: ${data.main.humidity}%<br>
+                    Wind: ${Math.round(data.wind.speed * 3.6)} km/h
+                `)
+                .openPopup();
+            
+            // Load weather layers
+            loadWeatherLayers(lat, lng);
+            
+            // Update last updated time
+            const now = new Date();
+            lastUpdatedElement.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            hideLoading();
+        }
+
+        function loadWeatherLayers(lat, lng) {
+            // Temperature layer
+            weatherLayers.temp = L.tileLayer(`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${API_KEY}`, {
+                maxZoom: 18,
+                opacity: 0.7
+            });
+            
+            // Precipitation layer
+            weatherLayers.precipitation = L.tileLayer(`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${API_KEY}`, {
+                maxZoom: 18,
+                opacity: 0.7
+            });
+            
+            // Wind layer
+            weatherLayers.wind = L.tileLayer(`https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${API_KEY}`, {
+                maxZoom: 18,
+                opacity: 0.7
+            });
+            
+            // Clouds layer
+            weatherLayers.clouds = L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${API_KEY}`, {
+                maxZoom: 18,
+                opacity: 0.7
+            });
+            
+            // Pressure layer
+            weatherLayers.pressure = L.tileLayer(`https://tile.openweathermap.org/map/pressure_new/{z}/{x}/{y}.png?appid=${API_KEY}`, {
+                maxZoom: 18,
+                opacity: 0.7
+            });
+            
+            // Show default layer
+            updateMapLayer();
+        }
+
+        function updateMapLayer() {
+            // Remove all weather layers
+            Object.values(weatherLayers).forEach(layer => {
+                if (layer && map.hasLayer(layer)) {
+                    map.removeLayer(layer);
+                }
+            });
+            
+            // Add the selected layer
+            if (weatherLayers[currentLayer]) {
+                weatherLayers[currentLayer].addTo(map);
+            }
+        }
+
+        function showLoading() {
+            mapLoadingElement.style.display = 'flex';
+        }
+
+        function hideLoading() {
+            mapLoadingElement.style.display = 'none';
+        }
+
+        // Initialize with default location
+        initMap();
+        getWeatherForMap(currentLocation);
+    </script>
+</body>
+</html>

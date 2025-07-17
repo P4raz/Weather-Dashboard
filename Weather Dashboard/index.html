@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #72edf2 0%, #5151e5 100%);
+    color: #fff;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#location-input {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 30px;
+    width: 70%;
+    max-width: 400px;
+    font-size: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#search-btn, #current-location-btn {
+    background-color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    color: #5151e5;
+    font-size: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+#search-btn:hover, #current-location-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.weather-card {
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.location-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.location-container h2 {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.location-container p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.weather-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.temperature-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.temperature-container img {
+    width: 80px;
+    height: 80px;
+}
+
+#temp {
+    font-size: 3.5rem;
+    font-weight: bold;
+}
+
+.unit-toggle {
+    display: inline-block;
+    vertical-align: super;
+}
+
+.unit-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.unit-btn.active {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.weather-details {
+    text-align: right;
+}
+
+.weather-details p {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+#description {
+    font-size: 1.3rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.weather-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-item, .sun-item {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.stat-item i, .sun-item i {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.stat-item span, .sun-item span {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.stat-item p, .sun-item p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.sun-times {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+footer {
+    text-align: center;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .weather-main {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .weather-details {
+        text-align: center;
+        margin-top: 15px;
+    }
+    
+    .weather-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .sun-times {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Weather Dashboard</h1>
+            <div class="search-container">
+                <input type="text" id="location-input" placeholder="Enter city name...">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
+                <button id="current-location-btn"><i class="fas fa-location-arrow"></i></button>
+            </div>
+        </header>
+
+        <main>
+            <div class="weather-card">
+                <div class="location-container">
+                    <h2 id="location">--</h2>
+                    <p id="date">--</p>
+                </div>
+
+                <div class="weather-main">
+                    <div class="temperature-container">
+                        <img id="weather-icon" src="https://openweathermap.org/img/wn/01d@2x.png" alt="Weather icon">
+                        <div>
+                            <span id="temp">--</span>
+                            <span class="unit-toggle">
+                                <button class="unit-btn active" id="celsius-btn">°C</button>
+                                <button class="unit-btn" id="fahrenheit-btn">°F</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="weather-details">
+                        <p id="description">--</p>
+                        <p>Feels like: <span id="feels-like">--</span></p>
+                    </div>
+                </div>
+
+                <div class="weather-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-tint"></i>
+                        <span id="humidity">--%</span>
+                        <p>Humidity</p>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-wind"></i>
+                        <span id="wind">-- km/h</span>
+                        <p>Wind</p>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span id="pressure">-- hPa</span>
+                        <p>Pressure</p>
+                    </div>
+                </div>
+
+                <div class="sun-times">
+                    <div class="sun-item">
+                        <i class="fas fa-sunrise"></i>
+                        <span id="sunrise">--:--</span>
+                        <p>Sunrise</p>
+                    </div>
+                    <div class="sun-item">
+                        <i class="fas fa-sunset"></i>
+                        <span id="sunset">--:--</span>
+                        <p>Sunset</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Last updated: <span id="last-updated">--</span></p>
+        </footer>
+    </div>
+
+    <script>
+// API configuration
+const API_KEY = 'YOUR_API_KEY'; // Replace with your OpenWeatherMap API key
+const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
+
+// DOM elements
+const locationInput = document.getElementById('location-input');
+const searchBtn = document.getElementById('search-btn');
+const currentLocationBtn = document.getElementById('current-location-btn');
+const locationElement = document.getElementById('location');
+const dateElement = document.getElementById('date');
+const tempElement = document.getElementById('temp');
+const weatherIcon = document.getElementById('weather-icon');
+const descriptionElement = document.getElementById('description');
+const feelsLikeElement = document.getElementById('feels-like');
+const humidityElement = document.getElementById('humidity');
+const windElement = document.getElementById('wind');
+const pressureElement = document.getElementById('pressure');
+const sunriseElement = document.getElementById('sunrise');
+const sunsetElement = document.getElementById('sunset');
+const lastUpdatedElement = document.getElementById('last-updated');
+const celsiusBtn = document.getElementById('celsius-btn');
+const fahrenheitBtn = document.getElementById('fahrenheit-btn');
+
+let currentUnit = 'celsius';
+
+// Event listeners
+searchBtn.addEventListener('click', () => {
+    const location = locationInput.value.trim();
+    if (location) {
+        getWeatherByLocation(location);
+    }
+});
+
+currentLocationBtn.addEventListener('click', getWeatherByCurrentLocation);
+
+locationInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        const location = locationInput.value.trim();
+        if (location) {
+            getWeatherByLocation(location);
+        }
+    }
+});
+
+celsiusBtn.addEventListener('click', () => {
+    if (currentUnit !== 'celsius') {
+        toggleTemperatureUnit('celsius');
+    }
+});
+
+fahrenheitBtn.addEventListener('click', () => {
+    if (currentUnit !== 'fahrenheit') {
+        toggleTemperatureUnit('fahrenheit');
+    }
+});
+
+// Functions
+async function getWeatherByLocation(location) {
+    try {
+        const response = await fetch(`${BASE_URL}?q=${location}&appid=${API_KEY}&units=metric`);
+        const data = await response.json();
+        
+        if (data.cod === 200) {
+            updateWeatherData(data);
+        } else {
+            alert('Location not found. Please try another city.');
+        }
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
+        alert('Error fetching weather data. Please try again.');
+    }
+}
+
+async function getWeatherByCurrentLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    const response = await fetch(`${BASE_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`);
+                    const data = await response.json();
+                    updateWeatherData(data);
+                } catch (error) {
+                    console.error('Error fetching weather data:', error);
+                    alert('Error fetching weather data. Please try again.');
+                }
+            },
+            (error) => {
+                console.error('Error getting location:', error);
+                alert('Unable to retrieve your location. Please enable location services or search manually.');
+            }
+        );
+    } else {
+        alert('Geolocation is not supported by your browser. Please search manually.');
+    }
+}
+
+function updateWeatherData(data) {
+    // Update location
+    locationElement.textContent = `${data.name}, ${data.sys.country}`;
+    
+    // Update date
+    const now = new Date();
+    dateElement.textContent = now.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    
+    // Update temperature and weather icon
+    const tempCelsius = Math.round(data.main.temp);
+    const tempFahrenheit = Math.round((tempCelsius * 9/5) + 32);
+    tempElement.dataset.celsius = tempCelsius;
+    tempElement.dataset.fahrenheit = tempFahrenheit;
+    tempElement.textContent = currentUnit === 'celsius' ? tempCelsius : tempFahrenheit;
+    
+    weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+    weatherIcon.alt = data.weather[0].description;
+    
+    // Update weather description
+    descriptionElement.textContent = data.weather[0].description;
+    
+    // Update feels like temperature
+    const feelsLikeCelsius = Math.round(data.main.feels_like);
+    const feelsLikeFahrenheit = Math.round((feelsLikeCelsius * 9/5) + 32);
+    feelsLikeElement.dataset.celsius = feelsLikeCelsius;
+    feelsLikeElement.dataset.fahrenheit = feelsLikeFahrenheit;
+    feelsLikeElement.textContent = currentUnit === 'celsius' 
+        ? `${feelsLikeCelsius}°C` 
+        : `${feelsLikeFahrenheit}°F`;
+    
+    // Update humidity
+    humidityElement.textContent = `${data.main.humidity}%`;
+    
+    // Update wind speed
+    const windKmh = Math.round(data.wind.speed * 3.6);
+    const windMph = Math.round(windKmh / 1.609);
+    windElement.dataset.kmh = `${windKmh} km/h`;
+    windElement.dataset.mph = `${windMph} mph`;
+    windElement.textContent = windElement.dataset.kmh;
+    
+    // Update pressure
+    pressureElement.textContent = `${data.main.pressure} hPa`;
+    
+    // Update sunrise and sunset times
+    const sunriseTime = new Date(data.sys.sunrise * 1000);
+    const sunsetTime = new Date(data.sys.sunset * 1000);
+    sunriseElement.textContent = sunriseTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    sunsetElement.textContent = sunsetTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // Update last updated time
+    lastUpdatedElement.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function toggleTemperatureUnit(unit) {
+    currentUnit = unit;
+    
+    // Update active button
+    if (unit === 'celsius') {
+        celsiusBtn.classList.add('active');
+        fahrenheitBtn.classList.remove('active');
+    } else {
+        celsiusBtn.classList.remove('active');
+        fahrenheitBtn.classList.add('active');
+    }
+    
+    // Update temperature display
+    if (tempElement.dataset.celsius) {
+        tempElement.textContent = unit === 'celsius' 
+            ? tempElement.dataset.celsius 
+            : tempElement.dataset.fahrenheit;
+    }
+    
+    // Update feels like temperature
+    if (feelsLikeElement.dataset.celsius) {
+        feelsLikeElement.textContent = unit === 'celsius' 
+            ? `${feelsLikeElement.dataset.celsius}°C` 
+            : `${feelsLikeElement.dataset.fahrenheit}°F`;
+    }
+    
+    // Update wind speed
+    if (windElement.dataset.kmh) {
+        windElement.textContent = unit === 'celsius' 
+            ? windElement.dataset.kmh 
+            : windElement.dataset.mph;
+    }
+}
+
+// Initialize with default location
+getWeatherByLocation('London');
+    </script>
+</body>
+</html>

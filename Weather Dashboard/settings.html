@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Weather Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #72edf2 0%, #5151e5 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            font-weight: 500;
+        }
+
+        .settings-card {
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .settings-section {
+            margin-bottom: 25px;
+        }
+
+        .settings-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .setting-group {
+            margin-bottom: 15px;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .radio-group, .checkbox-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-option input[type="radio"],
+        .checkbox-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #5151e5;
+        }
+
+        select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .color-scheme-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .color-scheme {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-scheme:hover {
+            transform: scale(1.05);
+        }
+
+        .color-scheme.selected {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .save-btn {
+            background-color: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .save-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Color scheme options */
+        .color-default {
+            background: linear-gradient(135deg, #72edf2 0%, #5151e5 100%);
+        }
+
+        .color-dark {
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+        }
+
+        .color-warm {
+            background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+        }
+
+        .color-cool {
+            background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%);
+        }
+
+        .color-earth {
+            background: linear-gradient(135deg, #614385 0%, #516395 100%);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .radio-group, .checkbox-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .settings-card {
+                padding: 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dashboard Settings</h1>
+            <div class="nav-links">
+                <a href="index.html">Current Weather</a>
+                <a href="forecast.html">5-Day Forecast</a>
+                <a href="hourly.html">Hourly Forecast</a>
+                <a href="map.html">Weather Map</a>
+                <a href="historical.html">Historical Data</a>
+                <a href="settings.html" class="active">Settings</a>
+            </div>
+        </header>
+
+        <div class="settings-card">
+            <div class="settings-section">
+                <h2>Units & Measurements</h2>
+                
+                <div class="setting-group">
+                    <label>Temperature Unit</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="unit-celsius" name="temperature-unit" value="celsius" checked>
+                            <label for="unit-celsius">Celsius (°C)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="unit-fahrenheit" name="temperature-unit" value="fahrenheit">
+                            <label for="unit-fahrenheit">Fahrenheit (°F)</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label>Wind Speed Unit</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="wind-kmh" name="wind-unit" value="kmh" checked>
+                            <label for="wind-kmh">km/h</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="wind-mph" name="wind-unit" value="mph">
+                            <label for="wind-mph">mph</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="wind-ms" name="wind-unit" value="ms">
+                            <label for="wind-ms">m/s</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label>Pressure Unit</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="pressure-hpa" name="pressure-unit" value="hpa" checked>
+                            <label for="pressure-hpa">hPa</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="pressure-inhg" name="pressure-unit" value="inhg">
+                            <label for="pressure-inhg">inHg</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h2>Appearance</h2>
+                
+                <div class="setting-group">
+                    <label>Color Scheme</label>
+                    <div class="color-scheme-options">
+                        <div class="color-scheme color-default selected" data-scheme="default"></div>
+                        <div class="color-scheme color-dark" data-scheme="dark"></div>
+                        <div class="color-scheme color-warm" data-scheme="warm"></div>
+                        <div class="color-scheme color-cool" data-scheme="cool"></div>
+                        <div class="color-scheme color-earth" data-scheme="earth"></div>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label>Default Location</label>
+                    <input type="text" id="default-location" placeholder="Enter default city name" class="text-input">
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h2>Notifications</h2>
+                
+                <div class="setting-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="notify-rain" checked>
+                        <label for="notify-rain">Rain alerts</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="notify-storm" checked>
+                        <label for="notify-storm">Severe weather alerts</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="notify-extreme">
+                        <label for="notify-extreme">Extreme temperature warnings</label>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label>Notification Time</label>
+                    <select id="notification-time">
+                        <option value="morning">Morning (7-9 AM)</option>
+                        <option value="afternoon">Afternoon (12-2 PM)</option>
+                        <option value="evening">Evening (5-7 PM)</option>
+                        <option value="custom">Custom time</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="save-btn" id="save-settings">
+                <i class="fas fa-save"></i> Save Settings
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Load saved settings
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('weatherDashboardSettings')) || {};
+            
+            // Units
+            if (settings.temperatureUnit) {
+                document.querySelector(`input[name="temperature-unit"][value="${settings.temperatureUnit}"]`).checked = true;
+            }
+            if (settings.windUnit) {
+                document.querySelector(`input[name="wind-unit"][value="${settings.windUnit}"]`).checked = true;
+            }
+            if (settings.pressureUnit) {
+                document.querySelector(`input[name="pressure-unit"][value="${settings.pressureUnit}"]`).checked = true;
+            }
+            
+            // Appearance
+            if (settings.colorScheme) {
+                document.querySelectorAll('.color-scheme').forEach(scheme => {
+                    scheme.classList.remove('selected');
+                    if (scheme.dataset.scheme === settings.colorScheme) {
+                        scheme.classList.add('selected');
+                    }
+                });
+            }
+            if (settings.defaultLocation) {
+                document.getElementById('default-location').value = settings.defaultLocation;
+            }
+            
+            // Notifications
+            if (settings.notifyRain !== undefined) {
+                document.getElementById('notify-rain').checked = settings.notifyRain;
+            }
+            if (settings.notifyStorm !== undefined) {
+                document.getElementById('notify-storm').checked = settings.notifyStorm;
+            }
+            if (settings.notifyExtreme !== undefined) {
+                document.getElementById('notify-extreme').checked = settings.notifyExtreme;
+            }
+            if (settings.notificationTime) {
+                document.getElementById('notification-time').value = settings.notificationTime;
+            }
+        }
+
+        // Save settings
+        function saveSettings() {
+            const settings = {
+                // Units
+                temperatureUnit: document.querySelector('input[name="temperature-unit"]:checked').value,
+                windUnit: document.querySelector('input[name="wind-unit"]:checked').value,
+                pressureUnit: document.querySelector('input[name="pressure-unit"]:checked').value,
+                
+                // Appearance
+                colorScheme: document.querySelector('.color-scheme.selected').dataset.scheme,
+                defaultLocation: document.getElementById('default-location').value,
+                
+                // Notifications
+                notifyRain: document.getElementById('notify-rain').checked,
+                notifyStorm: document.getElementById('notify-storm').checked,
+                notifyExtreme: document.getElementById('notify-extreme').checked,
+                notificationTime: document.getElementById('notification-time').value
+            };
+            
+            localStorage.setItem('weatherDashboardSettings', JSON.stringify(settings));
+            
+            // Show confirmation
+            alert('Settings saved successfully!');
+            
+            // Apply color scheme immediately
+            applyColorScheme(settings.colorScheme);
+        }
+
+        // Apply color scheme
+        function applyColorScheme(scheme) {
+            let gradient;
+            switch(scheme) {
+                case 'dark':
+                    gradient = 'linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)';
+                    break;
+                case 'warm':
+                    gradient = 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)';
+                    break;
+                case 'cool':
+                    gradient = 'linear-gradient(135deg, #4776E6 0%, #8E54E9 100%)';
+                    break;
+                case 'earth':
+                    gradient = 'linear-gradient(135deg, #614385 0%, #516395 100%)';
+                    break;
+                default:
+                    gradient = 'linear-gradient(135deg, #72edf2 0%, #5151e5 100%)';
+            }
+            
+            document.body.style.background = gradient;
+        }
+
+        // Event listeners
+        document.querySelectorAll('.color-scheme').forEach(scheme => {
+            scheme.addEventListener('click', function() {
+                document.querySelectorAll('.color-scheme').forEach(s => s.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        document.getElementById('save-settings').addEventListener('click', saveSettings);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            
+            // Apply saved color scheme on load
+            const savedSettings = JSON.parse(localStorage.getItem('weatherDashboardSettings')) || {};
+            if (savedSettings.colorScheme) {
+                applyColorScheme(savedSettings.colorScheme);
+            }
+        });
+    </script>
+</body>
+</html>
